@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import '../data/lesson_db.dart';
 
-class LessonsScreen extends StatelessWidget {
-  const LessonsScreen({super.key});
+class LessonScreen extends StatelessWidget {
+  final String subject;
+
+  const LessonScreen({super.key, required this.subject});
 
   @override
   Widget build(BuildContext context) {
-    final lessons = LessonDB.grade1Math;
+    final lessons = LessonDB.getLessons(subject);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('دروس الرياضيات')),
+      appBar: AppBar(
+        title: Text(subject),
+      ),
       body: ListView.builder(
         itemCount: lessons.length,
         itemBuilder: (context, index) {
@@ -17,13 +21,12 @@ class LessonsScreen extends StatelessWidget {
 
           return ListTile(
             title: Text(lesson.title),
-            subtitle: Text(lesson.description),
-            trailing: const Icon(Icons.arrow_forward),
+            trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => LessonDetailScreen(lesson: lesson),
+                  builder: (_) => LessonContentScreen(lesson: lesson),
                 ),
               );
             },
@@ -34,44 +37,38 @@ class LessonsScreen extends StatelessWidget {
   }
 }
 
-class LessonDetailScreen extends StatelessWidget {
+class LessonContentScreen extends StatelessWidget {
   final Lesson lesson;
 
-  const LessonDetailScreen({super.key, required this.lesson});
+  const LessonContentScreen({super.key, required this.lesson});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(lesson.title)),
+      appBar: AppBar(
+        title: Text(lesson.title),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
             Text(
-              lesson.description,
+              lesson.explanation,
               style: const TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 12),
-
-            const Text(
-              "أهداف الدرس:",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            ...lesson.objectives.map((o) => Text("• $o")),
-
             const SizedBox(height: 20),
             const Text(
-              "أسئلة تدريبية:",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              "الأسئلة:",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-
+            const SizedBox(height: 10),
             ...lesson.questions.map(
-              (q) => Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text("❓ ${q.question}"),
+              (q) => Card(
+                child: ListTile(
+                  title: Text(q),
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),
