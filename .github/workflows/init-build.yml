@@ -1,16 +1,16 @@
-name: Initialize and Build APK
+name: Build Flutter APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Flutter
@@ -21,7 +21,7 @@ jobs:
       - name: Create Flutter project if not exists
         run: |
           if [ ! -f pubspec.yaml ]; then
-            flutter create .
+            flutter create . --project-name taalum_core
           fi
 
       - name: Get dependencies
@@ -33,5 +33,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: taalum-apk
           path: build/app/outputs/flutter-apk/app-release.apk
