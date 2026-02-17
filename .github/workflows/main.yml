@@ -1,29 +1,32 @@
-name: Build APK
+name: Build Flutter APK
 
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Set up Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          channel: stable
 
-      - name: Install dependencies
+      - name: Create Flutter project if empty
+        run: |
+          if [ ! -f pubspec.yaml ]; then
+            flutter create app
+            mv app/* .
+            rm -rf app
+          fi
+
+      - name: Get packages
         run: flutter pub get
 
       - name: Build APK
@@ -32,5 +35,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
